@@ -33,11 +33,11 @@ export default function App() {
                     `${data[0]?.embedUrl}?ui_infos=0&ui_watermark_link=0&ui_watermark=0`
                 );
             });
-        // const results = await chat.sendMessage(
-        //     `
-        //         provide details for ${prompt}.dont use too much '\n'.
-        //     `
-        // );
+        const results = await chat.sendMessage(
+            `
+                provide details for ${prompt}.dont use too much '\n'.
+            `
+        );
         console.log(process.env.REACT_API_KEY);
         const response = results.response;
         const text = response.text();
