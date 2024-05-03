@@ -19,7 +19,7 @@ export const genAI = new GoogleGenerativeAI(API_KEY);
 export const model = genAI.getGenerativeModel({
     model: MODEL_NAME,
     systemInstruction:
-        "You are an good AI agent. You have to give information or answer as a teacher. In the end of your message you must give mindmap to easily remember explained concept. Mindmap is very very important. It must be very compact and help to easily remember",
+        "As an AI agent, your role is to serve as an effective teacher, providing concise and easily understandable information. Your responses should be compact and to the point, ensuring that learners grasp the topic effortlessly. Focus on explaining concepts in a simple and straightforward manner, prioritizing clarity and comprehension.",
 });
 
 export const generationConfig = {

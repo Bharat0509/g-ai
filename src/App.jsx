@@ -13,6 +13,7 @@ import ReactMarkdown from "react-markdown";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { useEffect, useRef, useState } from "react";
 import { chat, model, generationConfig, safetySettings } from "./lib/utils";
+import { Sheet, SheetContent, SheetTrigger } from "./components/ui/sheet";
 
 export default function App() {
     const [prompt, setPrompt] = useState("");
@@ -21,7 +22,13 @@ export default function App() {
     const [modelUrl, setModelUrl] = useState(null);
     const [isSuccess, setIsSuccess] = useState(false);
     const [history, setHistory] = useState([]);
+
+    const [mindmap, setMindmap] = useState({
+        res: "",
+        loading: false,
+    });
     // const bottomOfPanelRef = useRef(null);
+
     const handleChange = (e) => {
         setPrompt(e.target.value);
     };
@@ -31,6 +38,16 @@ export default function App() {
         safetySettings,
         history: history,
     });
+
+    const handleCreateMindMap = async () => {
+        setMindmap((prev) => ({ ...prev, loading: true }));
+        const results = await chat.sendMessage(
+            "generate the mindmap of the current history to easily remember explained concept. Mindmap is very important. It must be very compact and help to easily remember. directly give me the content of the mindmap without any extra word in proper format"
+        );
+
+        const res = results?.response;
+        setMindmap({ res: res?.text(), loading: false });
+    };
 
     const handleSubmit = async (e) => {
         setLoading(true);
@@ -67,9 +84,9 @@ export default function App() {
         const text = res.text();
 
         setLoading(false);
-        console.log("Adding response");
+
         setResponse((prev) => [...prev, { query: prompt, response: text }]);
-        console.log(response);
+
         setPrompt("");
     };
 
@@ -90,13 +107,29 @@ export default function App() {
                         Study<span className='text-blue-500'>Ground</span>.AI
                     </h1>
                     <div className='flex gap-4'>
-                        <Button
-                            variant='outline'
-                            size='sm'
-                            className='ml-auto gap-1.5 text-sm'
-                        >
-                            <Share className='size-3.5' /> Share
-                        </Button>
+                        <Sheet className='w-[50rem]'>
+                            <SheetTrigger asChild>
+                                <Button
+                                    variant='outline'
+                                    size='sm'
+                                    className='ml-auto gap-1.5 text-sm'
+                                    onClick={handleCreateMindMap}
+                                >
+                                    <Share className='size-3.5' /> Create
+                                    Mindmap
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side='right' className='w-[50vw]'>
+                                <p className='text-center'>MindMap</p>
+                                {mindmap?.loading ? (
+                                    <div className='h-[90vh] w-full animate-pulse bg-slate-600' />
+                                ) : (
+                                    <div className='h-[90vh] overflow-scroll'>
+                                        <ReactMarkdown children={mindmap.res} />
+                                    </div>
+                                )}
+                            </SheetContent>
+                        </Sheet>
                         <Button
                             variant='outline'
                             size='sm'
@@ -126,8 +159,10 @@ export default function App() {
                                     className='absolute h-full w-full object-cover opacity-50 '
                                 />
                                 <div class='text-center z-10'>
-                                    <h1 class='text-3xl font-bold mb-4'>
-                                        Revolutionize Your Learning Experience
+                                    <h1 class='text-4xl font-bold mb-4 px-2'>
+                                        Learn through interactive 3D models, Ask
+                                        AI as a teacher and Remember through
+                                        mindmaps
                                     </h1>
 
                                     <p class='text-lg mb-6'>
@@ -137,13 +172,14 @@ export default function App() {
                                         explore detailed models from every
                                         angle.
                                     </p>
-                                    <p class='text-lg mb-6'>
-                                        Whether you're unraveling the mysteries
-                                        of biology, deciphering architectural
-                                        wonders, or exploring any other subject,
-                                        our app transforms learning into a
-                                        captivating visual journey.
-                                    </p>
+
+                                    {/* <p class='text-lg mb-6'>
+                                            Whether you're unraveling the mysteries
+                                            of biology, deciphering architectural
+                                            wonders, or exploring any other subject,
+                                            our app transforms learning into a
+                                            captivating visual journey.
+                                        </p> */}
                                 </div>
                             </div>
                         )}
@@ -151,17 +187,18 @@ export default function App() {
                     <div className='relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 col-span-1 lg:col-span-3'>
                         <div className='flex-1 overflow-scroll w-full'>
                             <div className='h-[28rem] overflow-scroll w-[75vw] md:w-full flex flex-col-reverse'>
-                                {response.map((res, idx) => (
-                                    <div className='border-2 p-2 rounded-md border-blue-400'>
-                                        <p className='p-2 bg-slate-300'>
-                                            {res.query}
-                                        </p>
-                                        <ReactMarkdown
-                                            key={idx}
-                                            children={res.response}
-                                        />
-                                    </div>
-                                ))}
+                                {response &&
+                                    response?.map((res, idx) => (
+                                        <div className='border-2 p-2 rounded-md border-blue-400'>
+                                            <p className='p-2 bg-slate-300'>
+                                                {res.query}
+                                            </p>
+                                            <ReactMarkdown
+                                                key={idx}
+                                                children={res.response}
+                                            />
+                                        </div>
+                                    ))}
                             </div>
                         </div>
                         <form
