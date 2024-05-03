@@ -11,20 +11,21 @@ const {
     HarmBlockThreshold,
 } = require("@google/generative-ai");
 
-const MODEL_NAME = "gemini-1.0-pro";
 const API_KEY = process.env.REACT_APP_API_KEY;
-console.log(API_KEY);
-const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-const generationConfig = {
-    temperature: 0.9,
-    topK: 1,
-    topP: 1,
-    maxOutputTokens: 2048,
+const MODEL_NAME = "gemini-1.5-pro-latest";
+
+export const genAI = new GoogleGenerativeAI(API_KEY);
+export const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+export const generationConfig = {
+    temperature: 1,
+    topK: 0,
+    topP: 0.95,
+    maxOutputTokens: 8192,
 };
 
-const safetySettings = [
+export const safetySettings = [
     {
         category: HarmCategory.HARM_CATEGORY_HARASSMENT,
         threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
@@ -42,9 +43,3 @@ const safetySettings = [
         threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
     },
 ];
-
-export const chat = model.startChat({
-    generationConfig,
-    safetySettings,
-    history: [],
-});
