@@ -21,7 +21,7 @@ export default function App() {
     const [modelUrl, setModelUrl] = useState(null);
     const [isSuccess, setIsSuccess] = useState(false);
     const [history, setHistory] = useState([]);
-    const bottomOfPanelRef = useRef(null);
+    // const bottomOfPanelRef = useRef(null);
     const handleChange = (e) => {
         setPrompt(e.target.value);
     };
