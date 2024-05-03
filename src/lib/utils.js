@@ -16,7 +16,11 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const MODEL_NAME = "gemini-1.5-pro-latest";
 
 export const genAI = new GoogleGenerativeAI(API_KEY);
-export const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+export const model = genAI.getGenerativeModel({
+    model: MODEL_NAME,
+    systemInstruction:
+        "You are an good AI agent. You have to give information or answer as a teacher. In the end of your message you must give mindmap to easily remember explained concept. Mindmap is very very important. It must be very compact and help to easily remember",
+});
 
 export const generationConfig = {
     temperature: 1,

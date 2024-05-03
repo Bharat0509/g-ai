@@ -17,7 +17,7 @@ import { chat, model, generationConfig, safetySettings } from "./lib/utils";
 export default function App() {
     const [prompt, setPrompt] = useState("");
     const [loading, setLoading] = useState(false);
-    const [response, setResponse] = useState("");
+    const [response, setResponse] = useState([]);
     const [modelUrl, setModelUrl] = useState(null);
     const [isSuccess, setIsSuccess] = useState(false);
     const [history, setHistory] = useState([]);
@@ -50,22 +50,27 @@ export default function App() {
                 .then((res) => res.json())
                 .then((data) => data?.results)
                 .then((data) => {
-                    setModelUrl(
-                        `${data?.[0]?.embedUrl}?ui_infos=0&ui_watermark_link=0&ui_watermark=0`
-                    );
+                    if (data?.[0]?.embedUrl) {
+                        setModelUrl(
+                            `${data?.[0]?.embedUrl}?ui_infos=0&ui_watermark_link=0&ui_watermark=0`
+                        );
+                    }
                 });
         }
 
-        const results =
-            await chat.sendMessage(`you are an expert ai agent so act as Expert teacher and also don't mention this in your answer. 
-        now you need to provide answer for student question which is like this: ${prompt}. also you need to provide mind-map to easily remember question.If you have history then do consider that also for angering question.`);
+        const results = await chat.sendMessage(
+            `provide detailed answer for : ${prompt}.`
+        );
 
-        const response = results.response;
-        setHistory((history) => [...history, response.candidates[0].content]);
-        const text = response.text();
+        const res = results.response;
+        setHistory((history) => [...history, res.candidates[0].content]);
+        const text = res.text();
 
         setLoading(false);
-        setResponse((prev) => prev + "\n" + text);
+        console.log("Adding response");
+        setResponse((prev) => [...prev, { query: prompt, response: text }]);
+        console.log(response);
+        setPrompt("");
     };
 
     const handleNewTopicClick = () => {
@@ -146,9 +151,17 @@ export default function App() {
                     <div className='relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 col-span-1 lg:col-span-3'>
                         <div className='flex-1 overflow-scroll w-full'>
                             <div className='h-[28rem] overflow-scroll w-[75vw] md:w-full flex flex-col-reverse'>
-                                {" "}
-                                <ReactMarkdown children={response} />
-                                <div ref={bottomOfPanelRef} />
+                                {response.map((res, idx) => (
+                                    <div className='border-2 p-2 rounded-md border-blue-400'>
+                                        <p className='p-2 bg-slate-300'>
+                                            {res.query}
+                                        </p>
+                                        <ReactMarkdown
+                                            key={idx}
+                                            children={res.response}
+                                        />
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         <form
